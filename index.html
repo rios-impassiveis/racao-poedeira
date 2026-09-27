@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Calculadora de formulação de ração para galinhas poedeiras: 4 fases, percentuais editáveis, quantidade em kg, custo do lote e planejador de consumo.">
+<title>Ração da Poedeira</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<style>
+  :root {
+    color-scheme: light;
+    --bg:        #F1F3EE;
+    --panel:     #FFFFFF;
+    --panel-2:   #F7F9F4;
+    --ink:       #16211A;
+    --ink-2:     #4F5A53;
+    --muted:     #7B867E;
+    --line:      #DDE3D8;
+    --line-2:    #EBEFE7;
+    --accent:    #A55F04;
+    --accent-2:  #F6E9D2;
+    --ok:        #0ca30c;
+    --ok-ink:    #0a6b21;
+    --ok-bg:     #E7F4E4;
+    --warn:      #fab219;
+    --warn-ink:  #7E5305;
+    --warn-bg:   #FBF0D9;
+    --crit:      #d03b3b;
+    --crit-ink:  #96282A;
+    --focus:     #2a78d6;
+    --shadow:    0 1px 2px rgba(22,33,26,.05), 0 8px 24px -16px rgba(22,33,26,.35);
+
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+    --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948; --s9:#8C9689;
+
+    --f-display: "Zilla Slab", Georgia, serif;
+    --f-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:        #0F120E;
+      --panel:     #191C17;
+      --panel-2:   #202420;
+      --ink:       #ECEFE8;
+      --ink-2:     #B4BEB3;
+      --muted:     #8A9589;
+      --line:      #2E332C;
+      --line-2:    #262B25;
+      --accent:    #E9A93C;
+      --accent-2:  #33291A;
+      --ok-ink:    #6FD16F;
+      --ok-bg:     #172A18;
+      --warn-ink:  #F0C367;
+      --warn-bg:   #2C2413;
+      --crit-ink:  #F09393;
+      --focus:     #6da7ec;
+      --shadow:    0 1px 2px rgba(0,0,0,.4);
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+      --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#7C8A7E;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:        #0F120E;
+    --panel:     #191C17;
+    --panel-2:   #202420;
+    --ink:       #ECEFE8;
+    --ink-2:     #B4BEB3;
+    --muted:     #8A9589;
+    --line:      #2E332C;
+    --line-2:    #262B25;
+    --accent:    #E9A93C;
+    --accent-2:  #33291A;
+    --ok-ink:    #6FD16F;
+    --ok-bg:     #172A18;
+    --warn-ink:  #F0C367;
+    --warn-bg:   #2C2413;
+    --crit-ink:  #F09393;
+    --focus:     #6da7ec;
+    --shadow:    0 1px 2px rgba(0,0,0,.4);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#7C8A7E;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--f-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1, h2, h3 { font-family: var(--f-display); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding-inline: 16px; padding-block: 0 44px; }
+
+  /* ── cabeçalho ─────────────────────────────── */
+  .topbar {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
+    padding-block: 22px 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .brand { font-family: var(--f-display); font-size: 25px; font-weight: 700; letter-spacing: -.02em; }
+  .brand span { color: var(--accent); }
+  .tagline { color: var(--ink-2); font-size: 13.5px; }
+  .origem {
+    margin-left: auto; font-size: 11.5px; color: var(--muted);
+    font-family: var(--f-mono); letter-spacing: .02em;
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; white-space: nowrap;
+  }
+
+  /* ── seletor de fase ───────────────────────── */
+  .fases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .fase {
+    display: flex; flex-direction: column; gap: 2px; text-align: left;
+    padding: 11px 13px; cursor: pointer;
+    background: var(--panel); color: var(--ink-2);
+    border: 1px solid var(--line); border-radius: 10px;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .fase:hover { border-color: var(--muted); }
+  .fase b { font-family: var(--f-display); font-size: 15.5px; font-weight: 600; color: var(--ink); }
+  .fase small { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .fase[aria-pressed="true"] {
+    background: var(--accent-2); border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .fase[aria-pressed="true"] b, .fase[aria-pressed="true"] small { color: var(--accent); }
+
+  /* ── grade principal ───────────────────────── */
+  .grid { display: grid; grid-template-columns: minmax(0,1fr) 332px; gap: 18px; align-items: start; }
+  .rail { display: grid; gap: 18px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  .card > .head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--line-2);
+  }
+  .head h2 { font-size: 17px; }
+  .head .sub { font-size: 12px; color: var(--muted); }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 3px;
+  }
+
+  /* ── lote ──────────────────────────────────── */
+  .lote { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line-2); }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11.5px; color: var(--ink-2); font-weight: 500; }
+  .num {
+    width: 128px; padding: 9px 11px; text-align: right;
+    font-family: var(--f-mono); font-size: 16px; font-variant-numeric: tabular-nums;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .num:focus { background: var(--panel); border-color: var(--focus); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 6px 11px; cursor: pointer; font-size: 12.5px; font-family: var(--f-mono);
+    background: transparent; color: var(--ink-2);
+    border: 1px solid var(--line); border-radius: 999px;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── tabela ────────────────────────────────── */
+  .tabela-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 540px; }
+  thead th {
+    font-size: 10.5px; font-family: var(--f-mono); letter-spacing: .07em; text-transform: uppercase;
+    color: var(--muted); font-weight: 400; text-align: right; padding: 10px 12px 8px; white-space: nowrap;
+    border-bottom: 1px solid var(--line-2);
+  }
+  thead th:first-child { text-align: left; padding-left: 16px; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid var(--line-2); vertical-align: middle; text-align: right; }
+  tbody td:first-child { text-align: left; padding-left: 16px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--panel-2); }
+
+  .ing { display: flex; align-items: center; gap: 9px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .ing-nome {
+    font-weight: 500; width: 100%; min-width: 0; padding: 5px 7px;
+    background: transparent; border: 1px solid transparent; border-radius: 6px;
+  }
+  .ing-nome:hover { border-color: var(--line); }
+  .ing-nome:focus { background: var(--panel-2); border-color: var(--focus); }
+  .ing-col { min-width: 190px; }
+  .trilho { height: 3px; background: var(--line-2); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .trilho i { display: block; height: 100%; border-radius: 2px; }
+
+  .cell-in {
+    width: 78px; padding: 6px 9px; text-align: right;
+    font-family: var(--f-mono); font-size: 14px; font-variant-numeric: tabular-nums;
+    background: transparent; border: 1px solid transparent; border-radius: 6px;
+  }
+  .cell-in:hover { border-color: var(--line); }
+  .cell-in:focus { background: var(--panel-2); border-color: var(--focus); }
+  .kg { font-family: var(--f-mono); font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .kg u { text-decoration: none; color: var(--muted); font-size: 11.5px; font-weight: 400; margin-left: 2px; }
+  .custo { font-family: var(--f-mono); font-size: 13.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .del {
+    width: 26px; height: 26px; line-height: 1; cursor: pointer; color: var(--muted);
+    background: transparent; border: 1px solid transparent; border-radius: 6px; font-size: 16px;
+  }
+  .del:hover { color: var(--crit-ink); border-color: var(--line); }
+
+  tfoot td { padding: 11px 12px; border-top: 1px solid var(--line); font-weight: 600; text-align: right; }
+  tfoot td:first-child { text-align: left; padding-left: 16px; font-family: var(--f-display); }
+  tfoot .kg { font-size: 16px; }
+
+  /* ── rodapé da tabela ──────────────────────── */
+  .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 13px 16px; border-top: 1px solid var(--line-2); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .btn:hover { border-color: var(--muted); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn.primary { color: #1A1406; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary { color: #1A1406; } }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; }
+  .spacer { margin-left: auto; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 500; font-variant-numeric: tabular-nums;
+  }
+  .pill.ok   { background: var(--ok-bg);   color: var(--ok-ink); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); }
+  .pill .ic { font-size: 11px; }
+
+  /* ── resumo ────────────────────────────────── */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-2); }
+  .tile { background: var(--panel); padding: 13px 16px; min-width: 0; }
+  .tile .lab { font-size: 11px; color: var(--muted); font-family: var(--f-mono); letter-spacing: .05em; text-transform: uppercase; }
+  .tile .val {
+    font-size: 19px; font-weight: 600; letter-spacing: -.02em; margin-top: 2px;
+    font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tile .val small { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+  .tile.wide { grid-column: 1 / -1; }
+  .tile.wide .val { font-size: 30px; }
+  .linha-saco { display: flex; align-items: center; gap: 7px; padding: 11px 16px; border-top: 1px solid var(--line-2); font-size: 13px; color: var(--ink-2); }
+  .mini-sel { padding: 3px 5px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; font-size: 12.5px; }
+
+  /* ── composição ────────────────────────────── */
+  .comp { padding: 14px 16px 16px; position: relative; }
+  .barra { display: flex; gap: 2px; height: 30px; margin-bottom: 12px; }
+  .seg { flex-basis: 0; min-width: 0; position: relative; cursor: default;
+         display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .seg:first-child { border-radius: 6px 0 0 6px; }
+  .seg:last-child { border-radius: 0 6px 6px 0; }
+  .seg:only-child { border-radius: 6px; }
+  .seg span { font-family: var(--f-mono); font-size: 11px; font-weight: 500; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .legenda { display: grid; gap: 7px; }
+  .leg { display: grid; grid-template-columns: 10px minmax(0,1fr) auto auto; align-items: center; gap: 9px; font-size: 12.5px; }
+  .leg .nome { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .leg .pc { font-family: var(--f-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .leg .kgm { font-family: var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 68px; text-align: right; }
+  .tip {
+    position: absolute; z-index: 5; pointer-events: none; opacity: 0; transition: opacity .12s;
+    background: var(--ink); color: var(--bg); padding: 5px 9px; border-radius: 6px;
+    font-size: 12px; font-family: var(--f-mono); white-space: nowrap; transform: translate(-50%, -110%);
+  }
+  .tip.on { opacity: 1; }
+
+  /* ── avisos ────────────────────────────────── */
+  .avisos { display: grid; gap: 8px; padding: 13px 16px; border-top: 1px solid var(--line-2); }
+  .aviso { display: grid; grid-template-columns: 16px minmax(0,1fr); gap: 9px; font-size: 12.5px; color: var(--ink-2); line-height: 1.45; }
+  .aviso .ic { font-size: 13px; line-height: 1.3; }
+  .aviso.w .ic { color: var(--warn-ink); }
+  .aviso.i .ic { color: var(--muted); }
+  .aviso b { color: var(--ink); font-weight: 600; }
+
+  /* ── consumo ───────────────────────────────── */
+  .consumo { padding: 14px 16px 16px; display: grid; gap: 12px; }
+  .consumo .row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
+  .consumo .num { width: 100%; font-size: 14px; padding: 8px 10px; }
+  .resultado-consumo {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    padding: 11px 13px; background: var(--panel-2); border-radius: 9px; border: 1px solid var(--line-2);
+  }
+  .resultado-consumo .v { font-family: var(--f-mono); font-size: 19px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .resultado-consumo .l { font-size: 12px; color: var(--muted); }
+
+  .nota-fase { padding: 12px 16px; font-size: 12.5px; color: var(--ink-2); border-bottom: 1px solid var(--line-2); line-height: 1.5; }
+  .nota-fase b { color: var(--ink); font-weight: 600; }
+
+  footer.rodape { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); line-height: 1.6; max-width: 72ch; }
+  footer.rodape b { color: var(--ink-2); font-weight: 600; }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 30; padding: 16px;
+    display: flex; align-items: center; justify-content: center; background: rgba(8,12,8,.55);
+  }
+  .ovbox {
+    border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--ink);
+    padding: 16px; max-width: 560px; width: 100%; box-shadow: var(--shadow);
+  }
+  .ovbox textarea {
+    width: 100%; height: 260px; margin: 10px 0; padding: 10px; resize: vertical;
+    font-family: var(--f-mono); font-size: 12px; line-height: 1.6;
+    background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%);
+    background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px;
+    font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 20;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+  @media (max-width: 940px) {
+    .grid { grid-template-columns: 1fr; }
+    .rail { position: static; }
+  }
+  @media (max-width: 620px) {
+    .fases { grid-template-columns: 1fr 1fr; }
+    .origem { display: none; }
+    .lote { flex-direction: column; align-items: stretch; }
+    .lote .num { width: 100%; }
+    .tabela-wrap { overflow-x: visible; }
+    table, tbody, thead, tfoot, tr, td, th { display: block; }
+    thead { display: none; }
+    tbody tr { padding: 11px 14px; border-bottom: 1px solid var(--line-2); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px 10px; }
+    tbody td { border: none; padding: 0; text-align: left; }
+    tbody td.ing-col { grid-column: 1 / -1; min-width: 0; }
+    tbody td.c-del { position: absolute; right: 14px; }
+    tbody tr { position: relative; }
+    tbody td[data-l]::before {
+      content: attr(data-l); display: block; font-size: 10px; font-family: var(--f-mono);
+      letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px;
+    }
+    .cell-in { width: 100%; text-align: left; border-color: var(--line); background: var(--panel-2); }
+    tfoot tr { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px; }
+    tfoot td { padding: 0; border: none; }
+    tfoot td.c-pc, tfoot td.c-custo { display: none; }
+    table { min-width: 0; }
+    .consumo .row { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">Ração da <span>Poedeira</span></div>
+    <div class="tagline">Quanto de cada ingrediente entra no lote — por fase, em kg e em reais.</div>
+    <div class="origem">da planilha de formulação</div>
+  </header>
+
+  <nav class="fases" id="fases" aria-label="Fase de criação"></nav>
+
+  <div class="grid">
+    <section class="card">
+      <div class="head">
+        <div>
+          <span class="eyebrow" id="fase-eyebrow">Fase</span>
+          <h2 id="fase-nome">Ração de postura</h2>
+        </div>
+        <div class="sub" id="fase-faixa"></div>
+      </div>
+
+      <p class="nota-fase" id="fase-nota"></p>
+
+      <div class="lote">
+        <div class="field">
+          <label for="total">Total de ração a produzir</label>
+          <div style="display:flex;align-items:center;gap:7px">
+            <input class="num" id="total" type="text" inputmode="decimal" value="1.000">
+            <span style="color:var(--muted);font-size:13px">kg</span>
+          </div>
+        </div>
+        <div class="field" style="flex:1">
+          <label>Lotes comuns</label>
+          <div class="chips" id="chips"></div>
+        </div>
+      </div>
+
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Ingrediente</th>
+              <th scope="col">%</th>
+              <th scope="col">Quantidade</th>
+              <th scope="col">Preço / kg</th>
+              <th scope="col">Custo</th>
+              <th scope="col"><span class="sr" aria-label="Remover"></span></th>
+            </tr>
+          </thead>
+          <tbody id="corpo"></tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td class="c-pc"><span class="kg" id="soma-pc">100%</span></td>
+              <td><span class="kg" id="soma-kg">1.000 <u>kg</u></span></td>
+              <td class="c-custo"></td>
+              <td><span class="custo" id="soma-custo"></span></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="acoes">
+        <button class="btn" id="add">+ Ingrediente</button>
+        <button class="btn ghost" id="normalizar" hidden>Ajustar para 100%</button>
+        <span id="status-soma"></span>
+        <span class="spacer"></span>
+        <button class="btn ghost" id="restaurar">Restaurar fase</button>
+        <button class="btn primary" id="copiar">Copiar receita</button>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <div class="card">
+        <div class="tiles">
+          <div class="tile wide">
+            <div class="lab">Custo estimado do lote</div>
+            <div class="val" id="v-custo">—</div>
+          </div>
+          <div class="tile">
+            <div class="lab">Por kg</div>
+            <div class="val" id="v-custo-kg">—</div>
+          </div>
+          <div class="tile">
+            <div class="lab" id="lab-saco">Por saco</div>
+            <div class="val" id="v-custo-saco">—</div>
+          </div>
+        </div>
+        <div class="linha-saco">
+          <span><b id="v-lote-kg" style="font-family:var(--f-mono)">—</b> rendem <b id="v-sacos" style="font-family:var(--f-mono)">—</b> sacos de</span>
+          <select class="mini-sel" id="saco" aria-label="Peso do saco">
+            <option value="25">25 kg</option>
+            <option value="40" selected>40 kg</option>
+            <option value="50">50 kg</option>
+          </select>
+        </div>
+        <div class="avisos" id="avisos"></div>
+      </div>
+
+      <div class="card">
+        <div class="head"><h2>Composição</h2><div class="sub">% da mistura</div></div>
+        <div class="comp">
+          <div class="barra" id="barra" role="img" aria-label="Composição da ração por ingrediente"></div>
+          <div class="legenda" id="legenda"></div>
+          <div class="tip" id="tip"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div><span class="eyebrow">Planejador</span><h2>Quanto vou precisar</h2></div>
+        </div>
+        <div class="consumo">
+          <div class="row">
+            <div class="field">
+              <label for="aves">Aves</label>
+              <input class="num" id="aves" type="text" inputmode="numeric" value="100">
+            </div>
+            <div class="field">
+              <label for="gdia">g/ave/dia</label>
+              <input class="num" id="gdia" type="text" inputmode="decimal" value="115">
+            </div>
+            <div class="field">
+              <label for="dias">Dias</label>
+              <input class="num" id="dias" type="text" inputmode="numeric" value="30">
+            </div>
+          </div>
+          <div class="resultado-consumo">
+            <div>
+              <div class="l">Consumo no período</div>
+              <div class="v" id="v-consumo">345 kg</div>
+            </div>
+            <button class="btn" id="usar-consumo">Usar como lote</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="rodape">
+    <b>Como a conta é feita:</b> cada ingrediente recebe <code>(% ÷ soma dos %) × total do lote</code> — a mesma fórmula da planilha de origem. Por isso os kg sempre fecham o total, mesmo que a soma dos percentuais não dê exatamente 100%.<br>
+    <b>Valores de referência:</b> faixas de idade, consumo diário e os alertas de cálcio e núcleo são orientações gerais para consulta rápida. Siga sempre a dosagem do fabricante do núcleo e, para ajuste fino de proteína e energia, um técnico. Os preços vêm preenchidos como exemplo — troque pelos da sua região.
+  </footer>
+</div>
+
+<datalist id="sugestoes"></datalist>
+
+<div class="overlay" id="ov" hidden>
+  <div class="ovbox">
+    <h2 style="font-size:17px">Copiar receita</h2>
+    <p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">Selecione o texto e copie com Ctrl/Cmd + C.</p>
+    <textarea id="ov-txt" readonly aria-label="Receita em texto"></textarea>
+    <div style="display:flex;justify-content:flex-end"><button class="btn" id="ov-fechar">Fechar</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ────────── dados da planilha ────────── */
+  const FASES = [
+    {
+      id: "inicial", nome: "Ração inicial", curta: "Inicial", faixa: "1 a 6 semanas",
+      nota: "Fase de pinto. Proteína alta e <b>pouco cálcio</b> — excesso de calcário nessa idade compromete o rim da ave.",
+      total: 200, gdia: 30, dias: 42,
+      ings: [
+        { nome: "Milho", pct: 57.3 },
+        { nome: "Soja (farelo)", pct: 36.5 },
+        { nome: "Calcário calcítico", pct: 0 },
+        { nome: "Núcleo", pct: 4 },
+        { nome: "Óleo vegetal", pct: 2.2 }
+      ]
+    },
+    {
+      id: "crescimento", nome: "Ração de crescimento", curta: "Crescimento", faixa: "7 a 16 semanas",
+      nota: "Recria. O trigo entra como fibra e o calcário começa a subir para preparar o esqueleto da futura poedeira.",
+      total: 200, gdia: 65, dias: 70,
+      ings: [
+        { nome: "Milho", pct: 48.5 },
+        { nome: "Soja (farelo)", pct: 32.5 },
+        { nome: "Trigo (farelo)", pct: 5 },
+        { nome: "Calcário calcítico", pct: 8 },
+        { nome: "Núcleo", pct: 3 },
+        { nome: "Óleo vegetal", pct: 3 }
+      ]
+    },
+    {
+      id: "postura", nome: "Ração de postura", curta: "Postura", faixa: "a partir de 17 semanas",
+      nota: "Fase produtiva. O calcário em <b>8%</b> é o que sustenta a casca, e açafrão e urucum puxam a cor da gema.",
+      total: 1000, gdia: 115, dias: 30,
+      ings: [
+        { nome: "Milho", pct: 62 },
+        { nome: "Soja (farelo)", pct: 26 },
+        { nome: "Açafrão (cúrcuma)", pct: 0.5 },
+        { nome: "Gergelim", pct: 0 },
+        { nome: "Urucum", pct: 0.5 },
+        { nome: "Calcário calcítico", pct: 8 },
+        { nome: "Núcleo", pct: 1 },
+        { nome: "Óleo vegetal", pct: 2 }
+      ]
+    },
+    {
+      id: "terminacao", nome: "Ração de terminação", curta: "Terminação", faixa: "engorda, fase final",
+      nota: "Ração de acabamento para aves de corte ou caipira: mais milho, sem calcário e com os corantes naturais na pele.",
+      total: 100, gdia: 120, dias: 30,
+      ings: [
+        { nome: "Milho", pct: 67 },
+        { nome: "Soja (farelo)", pct: 25 },
+        { nome: "Açafrão (cúrcuma)", pct: 0.5 },
+        { nome: "Gergelim", pct: 0.5 },
+        { nome: "Urucum", pct: 0.5 },
+        { nome: "Calcário calcítico", pct: 0 },
+        { nome: "Núcleo", pct: 4 },
+        { nome: "Óleo vegetal", pct: 2.5 }
+      ]
+    }
+  ];
+
+  // preços de exemplo, em R$/kg — o usuário troca pelos da região dele
+  const PRECOS = {
+    "Milho": 1.25, "Soja (farelo)": 2.40, "Trigo (farelo)": 1.30,
+    "Calcário calcítico": 0.55, "Núcleo": 6.50, "Óleo vegetal": 7.00,
+    "Açafrão (cúrcuma)": 28.00, "Urucum": 22.00, "Gergelim": 16.00
+  };
+  const SUGESTOES = Object.keys(PRECOS).concat(["Sorgo", "Farelo de arroz", "Fosfato bicálcico", "Sal comum", "Calcário granulado", "Concha moída", "Farelo de girassol"]);
+  const CORES = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6", "--s7", "--s8"];
+  const LOTES = [25, 50, 100, 200, 500, 1000];
+
+  /* ────────── estado ────────── */
+  const CHAVE = "racao-poedeira-v1";
+  const estado = {
+    fase: "postura",
+    saco: 40,
+    dados: {},
+    precos: Object.assign({}, PRECOS),
+    consumo: { aves: 100, gdia: 115, dias: 30 }
+  };
+  FASES.forEach(f => {
+    estado.dados[f.id] = { total: f.total, ings: f.ings.map(i => ({ nome: i.nome, pct: i.pct })) };
+  });
+
+  function salvar() {
+    try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch (e) { /* sem storage: segue em memória */ }
+  }
+  function carregar() {
+    try {
+      const bruto = localStorage.getItem(CHAVE);
+      if (!bruto) return;
+      const s = JSON.parse(bruto);
+      if (!s || typeof s !== "object") return;
+      if (s.fase && estado.dados[s.fase]) estado.fase = s.fase;
+      if ([25, 40, 50].indexOf(Number(s.saco)) > -1) estado.saco = Number(s.saco);
+      if (s.precos) Object.assign(estado.precos, s.precos);
+      if (s.consumo) Object.assign(estado.consumo, s.consumo);
+      if (s.dados) {
+        FASES.forEach(f => {
+          const d = s.dados[f.id];
+          if (d && Array.isArray(d.ings) && d.ings.length) {
+            estado.dados[f.id] = {
+              total: Number(d.total) > 0 ? Number(d.total) : f.total,
+              ings: d.ings.filter(i => i && i.nome).map(i => ({ nome: String(i.nome).slice(0, 40), pct: num(i.pct) }))
+            };
+          }
+        });
+      }
+    } catch (e) { /* estado salvo ilegível: usa os padrões */ }
+  }
+
+  /* ────────── utilidades ────────── */
+  const nf = (n, d) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: d === undefined ? 2 : d }).format(n);
+  const nf2 = n => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  const brl = n => "R$ " + new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  function num(v) {
+    if (typeof v === "number") return isFinite(v) ? v : 0;
+    if (v === null || v === undefined) return 0;
+    const t = String(v).trim().replace(/\s|R\$|kg/gi, "").replace(/\.(?=\d{3}\b)/g, "").replace(",", ".");
+    const n = parseFloat(t);
+    return isFinite(n) && n >= 0 ? n : 0;
+  }
+  const $ = id => document.getElementById(id);
+  const cor = i => "var(" + CORES[i % CORES.length] + ")";
+  const faseAtual = () => FASES.find(f => f.id === estado.fase);
+  const dadosAtuais = () => estado.dados[estado.fase];
+
+  let toastT;
+  function toast(msg) {
+    const el = $("toast");
+    el.textContent = msg; el.classList.add("on");
+    clearTimeout(toastT);
+    toastT = setTimeout(() => el.classList.remove("on"), 2200);
+  }
+
+  /* ────────── seletor de fase ────────── */
+  function renderFases() {
+    const nav = $("fases");
+    nav.textContent = "";
+    FASES.forEach(f => {
+      const b = document.createElement("button");
+      b.className = "fase";
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(f.id === estado.fase));
+      b.innerHTML = "<b></b><small></small>";
+      b.querySelector("b").textContent = f.curta;
+      b.querySelector("small").textContent = f.faixa;
+      b.addEventListener("click", () => {
+        estado.fase = f.id;
+        estado.consumo.gdia = f.gdia;
+        estado.consumo.dias = f.dias;
+        $("gdia").value = nf(f.gdia);
+        $("dias").value = nf(f.dias, 0);
+        renderFases(); renderTabela(); calcConsumo(); recalc(); salvar();
+      });
+      nav.appendChild(b);
+    });
+    const f = faseAtual();
+    $("fase-nome").textContent = f.nome;
+    $("fase-faixa").textContent = f.faixa;
+    $("fase-nota").innerHTML = f.nota;
+    $("fase-eyebrow").textContent = "Fase " + (FASES.indexOf(f) + 1) + " de 4";
+    $("total").value = nf(dadosAtuais().total);
+  }
+
+  /* ────────── chips de lote ────────── */
+  function renderChips() {
+    const c = $("chips");
+    c.textContent = "";
+    LOTES.forEach(v => {
+      const b = document.createElement("button");
+      b.className = "chip"; b.type = "button";
+      b.textContent = nf(v, 0) + " kg";
+      b.addEventListener("click", () => {
+        dadosAtuais().total = v;
+        $("total").value = nf(v);
+        recalc(); salvar();
+      });
+      c.appendChild(b);
+    });
+  }
+
+  /* ────────── tabela ────────── */
+  let linhas = [];
+
+  function renderTabela() {
+    const corpo = $("corpo");
+    corpo.textContent = "";
+    linhas = [];
+    const ings = dadosAtuais().ings;
+
+    ings.forEach((ing, idx) => {
+      const tr = document.createElement("tr");
+
+      const tdNome = document.createElement("td");
+      tdNome.className = "ing-col";
+      const wrap = document.createElement("div");
+      wrap.className = "ing";
+      const dot = document.createElement("i");
+      dot.className = "dot"; dot.style.background = cor(idx);
+      const nome = document.createElement("input");
+      nome.className = "ing-nome"; nome.type = "text"; nome.value = ing.nome;
+      nome.id = "nome-" + estado.fase + "-" + idx;
+      nome.setAttribute("list", "sugestoes");
+      nome.setAttribute("aria-label", "Nome do ingrediente " + (idx + 1));
+      nome.addEventListener("change", () => {
+        const novo = nome.value.trim().slice(0, 40);
+        if (!novo) { nome.value = ing.nome; return; }
+        if (estado.precos[novo] === undefined) estado.precos[novo] = estado.precos[ing.nome] || 0;
+        ing.nome = novo;
+        renderTabela(); recalc(); salvar();
+      });
+      wrap.append(dot, nome);
+      const trilho = document.createElement("div");
+      trilho.className = "trilho";
+      const fill = document.createElement("i");
+      fill.style.background = cor(idx);
+      trilho.appendChild(fill);
+      tdNome.append(wrap, trilho);
+
+      const tdPct = document.createElement("td");
+      tdPct.dataset.l = "%";
+      const inPct = document.createElement("input");
+      inPct.className = "cell-in"; inPct.type = "text"; inPct.inputMode = "decimal";
+      inPct.id = "pct-" + estado.fase + "-" + idx;
+      inPct.value = nf(ing.pct);
+      inPct.setAttribute("aria-label", "Percentual de " + ing.nome);
+      inPct.addEventListener("input", () => { ing.pct = num(inPct.value); recalc(); });
+      inPct.addEventListener("change", () => { ing.pct = num(inPct.value); inPct.value = nf(ing.pct); recalc(); salvar(); });
+      tdPct.appendChild(inPct);
+
+      const tdKg = document.createElement("td");
+      tdKg.dataset.l = "Quantidade";
+      const spKg = document.createElement("span");
+      spKg.className = "kg";
+      tdKg.appendChild(spKg);
+
+      const tdPreco = document.createElement("td");
+      tdPreco.dataset.l = "Preço / kg";
+      const inPreco = document.createElement("input");
+      inPreco.className = "cell-in"; inPreco.type = "text"; inPreco.inputMode = "decimal";
+      inPreco.id = "preco-" + estado.fase + "-" + idx;
+      inPreco.value = nf2(estado.precos[ing.nome] || 0);
+      inPreco.setAttribute("aria-label", "Preço por kg de " + ing.nome);
+      inPreco.addEventListener("input", () => { estado.precos[ing.nome] = num(inPreco.value); recalc(); });
+      inPreco.addEventListener("change", () => {
+        estado.precos[ing.nome] = num(inPreco.value);
+        inPreco.value = nf2(estado.precos[ing.nome]);
+        recalc(); salvar();
+      });
+      tdPreco.appendChild(inPreco);
+
+      const tdCusto = document.createElement("td");
+      tdCusto.dataset.l = "Custo";
+      const spCusto = document.createElement("span");
+      spCusto.className = "custo";
+      tdCusto.appendChild(spCusto);
+
+      const tdDel = document.createElement("td");
+      tdDel.className = "c-del";
+      const bDel = document.createElement("button");
+      bDel.className = "del"; bDel.type = "button"; bDel.innerHTML = "&times;";
+      bDel.title = "Remover " + ing.nome;
+      bDel.setAttribute("aria-label", "Remover " + ing.nome);
+      bDel.addEventListener("click", () => {
+        dadosAtuais().ings.splice(idx, 1);
+        renderTabela(); recalc(); salvar();
+        toast(ing.nome + " removido");
+      });
+      tdDel.appendChild(bDel);
+
+      tr.append(tdNome, tdPct, tdKg, tdPreco, tdCusto, tdDel);
+      corpo.appendChild(tr);
+      linhas.push({ ing: ing, kg: spKg, custo: spCusto, fill: fill, idx: idx });
+    });
+  }
+
+  /* ────────── cálculo ────────── */
+  function calcular() {
+    const d = dadosAtuais();
+    const soma = d.ings.reduce((a, i) => a + i.pct, 0);
+    const total = d.total;
+    const itens = d.ings.map((ing, idx) => {
+      const kg = soma > 0 ? (ing.pct / soma) * total : 0;
+      const preco = estado.precos[ing.nome] || 0;
+      return { nome: ing.nome, pct: ing.pct, share: soma > 0 ? (ing.pct / soma) * 100 : 0, kg: kg, custo: kg * preco, idx: idx };
+    });
+    return { soma: soma, total: total, itens: itens, custo: itens.reduce((a, i) => a + i.custo, 0) };
+  }
+
+  function recalc() {
+    const r = calcular();
+
+    linhas.forEach((l, i) => {
+      const it = r.itens[i];
+      if (!it) return;
+      l.kg.innerHTML = nf(it.kg) + " <u>kg</u>";
+      l.custo.textContent = it.custo > 0 ? brl(it.custo) : "—";
+      l.fill.style.width = Math.min(100, it.share) + "%";
+    });
+
+    $("soma-pc").textContent = nf(r.soma) + "%";
+    $("soma-kg").innerHTML = nf(r.total) + " <u>kg</u>";
+    $("soma-custo").textContent = r.custo > 0 ? brl(r.custo) : "—";
+
+    const st = $("status-soma");
+    const fechou = Math.abs(r.soma - 100) < 0.05;
+    st.innerHTML = "";
+    const pill = document.createElement("span");
+    pill.className = "pill " + (fechou ? "ok" : "warn");
+    pill.innerHTML = '<span class="ic" aria-hidden="true">' + (fechou ? "✓" : "▲") + "</span>";
+    pill.appendChild(document.createTextNode(fechou ? "Soma 100%" : "Soma " + nf(r.soma) + "% — kg ajustados ao total"));
+    st.appendChild(pill);
+    $("normalizar").hidden = fechou;
+
+    $("v-custo").textContent = r.custo > 0 ? brl(r.custo) : "—";
+    const ckg = r.total > 0 ? r.custo / r.total : 0;
+    $("v-custo-kg").textContent = ckg > 0 ? brl(ckg) : "—";
+    $("v-custo-saco").textContent = ckg > 0 ? brl(ckg * estado.saco) : "—";
+    $("lab-saco").textContent = "Por saco de " + estado.saco + " kg";
+    const sacos = estado.saco > 0 ? r.total / estado.saco : 0;
+    $("v-sacos").textContent = nf(sacos, 1);
+    $("v-lote-kg").textContent = nf(r.total) + " kg";
+
+    renderComposicao(r);
+    renderAvisos(r);
+  }
+
+  /* ────────── composição ────────── */
+  function renderComposicao(r) {
+    const barra = $("barra"), leg = $("legenda");
+    barra.textContent = ""; leg.textContent = "";
+    const vis = r.itens.filter(i => i.share > 0).sort((a, b) => b.share - a.share);
+
+    if (!vis.length) {
+      const vazio = document.createElement("div");
+      vazio.style.cssText = "font-size:12.5px;color:var(--muted)";
+      vazio.textContent = "Informe ao menos um percentual para ver a composição.";
+      leg.appendChild(vazio);
+      return;
+    }
+
+    const tip = $("tip");
+    vis.forEach(it => {
+      const seg = document.createElement("div");
+      seg.className = "seg";
+      seg.style.flexGrow = String(it.share);
+      seg.style.background = cor(it.idx);
+      seg.tabIndex = 0;
+      seg.setAttribute("aria-label", it.nome + ": " + nf(it.share, 1) + "% , " + nf(it.kg) + " kg");
+      if (it.share >= 9) {
+        const s = document.createElement("span");
+        s.textContent = nf(it.share, it.share >= 10 ? 0 : 1) + "%";
+        seg.appendChild(s);
+      }
+      const mostrar = ev => {
+        tip.textContent = it.nome + " · " + nf(it.share, 1) + "% · " + nf(it.kg) + " kg";
+        const cx = ev && ev.clientX ? ev.clientX : seg.getBoundingClientRect().left + seg.offsetWidth / 2;
+        const base = barra.parentElement.getBoundingClientRect();
+        const x = Math.max(70, Math.min(base.width - 70, cx - base.left));
+        tip.style.left = x + "px";
+        tip.style.top = (seg.getBoundingClientRect().top - base.top) + "px";
+        tip.classList.add("on");
+      };
+      seg.addEventListener("pointermove", mostrar);
+      seg.addEventListener("pointerenter", mostrar);
+      seg.addEventListener("focus", mostrar);
+      seg.addEventListener("pointerleave", () => tip.classList.remove("on"));
+      seg.addEventListener("blur", () => tip.classList.remove("on"));
+      barra.appendChild(seg);
+
+      const l = document.createElement("div");
+      l.className = "leg";
+      const d = document.createElement("i");
+      d.className = "dot"; d.style.background = cor(it.idx);
+      const n = document.createElement("span");
+      n.className = "nome"; n.textContent = it.nome;
+      const p = document.createElement("span");
+      p.className = "pc"; p.textContent = nf(it.share, 1) + "%";
+      const k = document.createElement("span");
+      k.className = "kgm"; k.textContent = nf(it.kg) + " kg";
+      l.append(d, n, p, k);
+      leg.appendChild(l);
+    });
+  }
+
+  /* ────────── avisos de referência ────────── */
+  function renderAvisos(r) {
+    const box = $("avisos");
+    box.textContent = "";
+    const pc = nome => { const i = r.itens.find(x => x.nome === nome); return i ? i.share : 0; };
+    const calcario = pc("Calcário calcítico") + pc("Calcário granulado") + pc("Concha moída");
+    const nucleo = pc("Núcleo");
+    const oleo = pc("Óleo vegetal");
+    const avisos = [];
+
+    if (estado.fase === "postura" && calcario < 6) {
+      avisos.push(["w", "Cálcio baixo para postura.", "A referência fica entre 7% e 9% de calcário; abaixo disso a casca afina e a ave puxa cálcio do próprio osso."]);
+    }
+    if ((estado.fase === "inicial" || estado.fase === "crescimento") && calcario > 3 && estado.fase === "inicial") {
+      avisos.push(["w", "Cálcio alto para pintinhos.", "Na fase inicial o excesso de calcário sobrecarrega os rins. Ele só sobe de verdade perto da postura."]);
+    }
+    if (nucleo === 0) {
+      avisos.push(["w", "Sem núcleo na mistura.", "É dele que vêm vitaminas, minerais e aminoácidos. Use a dosagem impressa na embalagem do fabricante."]);
+    }
+    if (oleo > 5) {
+      avisos.push(["i", "Óleo acima de 5%.", "Empelota na mistura e rança mais rápido no calor — faça lotes menores se for manter esse nível."]);
+    }
+    if (r.total > 0 && r.itens.some(i => i.share > 0 && i.kg < 0.1 && i.kg > 0)) {
+      avisos.push(["i", "Tem ingrediente abaixo de 100 g no lote.", "Pesagens tão pequenas erram fácil: faça uma pré-mistura com um pouco de milho moído antes de jogar no total."]);
+    }
+    if (!avisos.length) {
+      avisos.push(["i", "Formulação dentro das referências.", "Conferido: cálcio compatível com a fase, núcleo presente e óleo em nível que ainda mistura bem."]);
+    }
+
+    avisos.slice(0, 3).forEach(a => {
+      const el = document.createElement("div");
+      el.className = "aviso " + a[0];
+      const ic = document.createElement("span");
+      ic.className = "ic"; ic.setAttribute("aria-hidden", "true");
+      ic.textContent = a[0] === "w" ? "▲" : "•";
+      const tx = document.createElement("span");
+      const b = document.createElement("b");
+      b.textContent = a[1];
+      tx.append(b, document.createTextNode(" " + a[2]));
+      el.append(ic, tx);
+      box.appendChild(el);
+    });
+  }
+
+  /* ────────── receita em texto ────────── */
+  function receitaTexto() {
+    const r = calcular(), f = faseAtual();
+    const larg = Math.max.apply(null, r.itens.map(i => i.nome.length).concat([10]));
+    const linha = i => i.nome.padEnd(larg, ".") + " " + (nf(i.pct) + "%").padStart(7) + "  " + (nf(i.kg) + " kg").padStart(12);
+    let t = f.nome.toUpperCase() + " — lote de " + nf(r.total) + " kg\n";
+    t += "-".repeat(larg + 22) + "\n";
+    t += r.itens.map(linha).join("\n") + "\n";
+    t += "-".repeat(larg + 22) + "\n";
+    t += "TOTAL".padEnd(larg, ".") + " " + (nf(r.soma) + "%").padStart(7) + "  " + (nf(r.total) + " kg").padStart(12) + "\n";
+    if (r.custo > 0) t += "\nCusto estimado: " + brl(r.custo) + "  (" + brl(r.custo / r.total) + "/kg)\n";
+    t += "\nkg = (% ÷ soma dos %) × total do lote";
+    return t;
+  }
+
+  /* ────────── eventos ────────── */
+  $("total").addEventListener("input", () => { dadosAtuais().total = num($("total").value); recalc(); });
+  $("total").addEventListener("change", () => {
+    const v = num($("total").value) || faseAtual().total;
+    dadosAtuais().total = v; $("total").value = nf(v); recalc(); salvar();
+  });
+
+  $("saco").addEventListener("change", () => { estado.saco = Number($("saco").value); recalc(); salvar(); });
+
+  $("add").addEventListener("click", () => {
+    const d = dadosAtuais();
+    const usados = d.ings.map(i => i.nome);
+    const sugestao = SUGESTOES.find(s => usados.indexOf(s) === -1) || "Novo ingrediente";
+    d.ings.push({ nome: sugestao, pct: 0 });
+    renderTabela(); recalc(); salvar();
+    const campo = $("nome-" + estado.fase + "-" + (d.ings.length - 1));
+    if (campo) { campo.focus(); campo.select(); }
+    toast("Escreva o nome e informe o %");
+  });
+
+  $("normalizar").addEventListener("click", () => {
+    const d = dadosAtuais();
+    const soma = d.ings.reduce((a, i) => a + i.pct, 0);
+    if (soma <= 0) { toast("Informe os percentuais primeiro"); return; }
+    d.ings.forEach(i => { i.pct = Math.round((i.pct / soma) * 1000) / 10; });
+    // o arredondamento a 1 casa sobra uns décimos: joga a diferença no maior ingrediente
+    const resto = Math.round((100 - d.ings.reduce((a, i) => a + i.pct, 0)) * 10) / 10;
+    if (resto !== 0) {
+      const maior = d.ings.reduce((a, i) => (i.pct > a.pct ? i : a), d.ings[0]);
+      maior.pct = Math.round((maior.pct + resto) * 10) / 10;
+    }
+    renderTabela(); recalc(); salvar();
+    toast("Percentuais ajustados para 100%");
+  });
+
+  $("restaurar").addEventListener("click", () => {
+    const f = faseAtual();
+    estado.dados[f.id] = { total: f.total, ings: f.ings.map(i => ({ nome: i.nome, pct: i.pct })) };
+    $("total").value = nf(f.total);
+    renderTabela(); recalc(); salvar();
+    toast("Valores originais da planilha restaurados");
+  });
+
+  $("copiar").addEventListener("click", async () => {
+    const txt = receitaTexto();
+    try {
+      await navigator.clipboard.writeText(txt);
+      toast("Receita copiada");
+    } catch (e) {
+      $("ov-txt").value = txt;
+      $("ov").hidden = false;
+      $("ov-txt").focus();
+      $("ov-txt").select();
+    }
+  });
+  $("ov-fechar").addEventListener("click", () => { $("ov").hidden = true; });
+  $("ov").addEventListener("click", ev => { if (ev.target === $("ov")) $("ov").hidden = true; });
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") $("ov").hidden = true; });
+
+  ["aves", "gdia", "dias"].forEach(id => {
+    $(id).addEventListener("input", calcConsumo);
+    $(id).addEventListener("change", () => { calcConsumo(); salvar(); });
+  });
+  function calcConsumo() {
+    estado.consumo.aves = num($("aves").value);
+    estado.consumo.gdia = num($("gdia").value);
+    estado.consumo.dias = num($("dias").value);
+    const kg = estado.consumo.aves * estado.consumo.gdia * estado.consumo.dias / 1000;
+    $("v-consumo").textContent = nf(kg) + " kg";
+    return kg;
+  }
+  $("usar-consumo").addEventListener("click", () => {
+    const kg = calcConsumo();
+    if (kg <= 0) { toast("Preencha aves, gramas e dias"); return; }
+    const v = Math.round(kg * 100) / 100;
+    dadosAtuais().total = v;
+    $("total").value = nf(v);
+    recalc(); salvar();
+    toast("Lote ajustado para " + nf(v) + " kg");
+  });
+
+  /* ────────── início ────────── */
+  carregar();
+  SUGESTOES.forEach(s => {
+    const o = document.createElement("option");
+    o.value = s;
+    $("sugestoes").appendChild(o);
+  });
+  $("saco").value = String(estado.saco);
+  $("aves").value = nf(estado.consumo.aves, 0);
+  $("gdia").value = nf(estado.consumo.gdia);
+  $("dias").value = nf(estado.consumo.dias, 0);
+  renderChips();
+  renderFases();
+  renderTabela();
+  calcConsumo();
+  recalc();
+})();
+</script>
+</body>
+</html>
